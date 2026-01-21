@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carga Pro - Web</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: white; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #16213e; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #0f3460; background: #e94560; padding: 10px; border-radius: 8px; margin-top: 0; }
+        label { display: block; margin-top: 15px; font-size: 14px; color: #add8e6; }
+        input { width: 100%; padding: 12px; margin-top: 5px; border: none; border-radius: 5px; background: #0f3460; color: white; box-sizing: border-box; }
+        button { width: 100%; background: #e94560; color: white; border: none; padding: 15px; margin-top: 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #cf3a54; }
+        .success { color: #4ee44e; text-align: center; margin-top: 15px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>REGISTRO DE CARGA</h2>
+    <form id="cargaForm">
+        <label>Email:</label>
+        <input type="email" id="email" required>
+
+        <label>Nombre:</label>
+        <input type="text" id="nombre" required>
+
+        <label>Esfuerzo (RPE 1-10):</label>
+        <input type="number" id="rpe" min="1" max="10" required>
+
+        <label>Minutos entrenados:</label>
+        <input type="number" id="duracion" required>
+
+        <button type="submit" id="btnEnviar">ENVIAR DATOS</button>
+        <div id="mensaje" class="success">¡Datos guardados!</div>
+    </form>
+</div>
+
+<script>
+    const scriptURL = 'TU_URL_DE_GOOGLE_AQUI'; https://script.google.com/macros/s/AKfycbwo2TKxR-aY6eqAQFYq2IODkBmslTYfNBj7ClsE1nROVQbDSratCDlJkk-Th9A2cU4/exec
+    const form = document.getElementById('cargaForm');
+
+    // Autocompletar datos guardados
+    window.onload = () => {
+        if(localStorage.getItem('email')) document.getElementById('email').value = localStorage.getItem('email');
+        if(localStorage.getItem('nombre')) document.getElementById('nombre').value = localStorage.getItem('nombre');
+    };
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const btn = document.getElementById('btnEnviar');
+        btn.innerText = "Enviando...";
+        btn.disabled = true;
+
+        // Guardar para la próxima vez
+        localStorage.setItem('email', document.getElementById('email').value);
+        localStorage.setItem('nombre', document.getElementById('nombre').value);
+
+        const datos = {
+            email: document.getElementById('email').value,
+            nombre: document.getElementById('nombre').value,
+            rpe: document.getElementById('rpe').value,
+            duracion: document.getElementById('duracion').value
+        };
+
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        })
+        .then(() => {
+            document.getElementById('mensaje').style.display = 'block';
+            btn.innerText = "ENVIAR DATOS";
+            btn.disabled = false;
+            form.reset();
+            // Restaurar datos autocompletados
+            document.getElementById('email').value = localStorage.getItem('email');
+            document.getElementById('nombre').value = localStorage.getItem('nombre');
+            setTimeout(() => { document.getElementById('mensaje').style.display = 'none'; }, 3000);
+        })
+        .catch(error => alert('Error!', error.message));
+    });
+</script>
+
+</body>
+</html>
